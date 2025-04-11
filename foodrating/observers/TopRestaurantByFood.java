@@ -15,11 +15,25 @@ public class TopRestaurantByFood implements TopObserver{
     public void update(Order order, int currRating) {
         int restaurantId = order.getRestaurantId();
         for(Food food : order.getFoods()){
-            ConcurrentHashMap<Integer, Rating> restRating = topRestaurants.getOrDefault(food.getId(), new ConcurrentHashMap<>());
-            Rating rating = restRating.getOrDefault(restaurantId, new Rating(0, 0));
-            rating.add(currRating);
-            restRating.putIfAbsent(restaurantId, rating);
-            topRestaurants.putIfAbsent(food.getId(), restRating);
+            // ConcurrentHashMap<Integer, Rating> restRating = topRestaurants.getOrDefault(food.getId(), new ConcurrentHashMap<>());
+            // Rating rating = restRating.getOrDefault(restaurantId, new Rating(0, 0));
+            // rating.add(currRating);
+            // restRating.putIfAbsent(restaurantId, rating);
+            // topRestaurants.putIfAbsent(food.getId(), restRating);
+
+            topRestaurants.compute(food.getId(), (foodId, restRating) -> {
+                if (restRating == null) {
+                    restRating = new ConcurrentHashMap<>();
+                }
+                restRating.compute(restaurantId, (restId, rating) -> {
+                    if (rating == null) {
+                        rating = new Rating(0, 0);
+                    }
+                    return rating.add(currRating);
+                });
+                return restRating;
+            });
+
         }
     }
 
