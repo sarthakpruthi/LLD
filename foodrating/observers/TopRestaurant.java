@@ -40,7 +40,7 @@ public class TopRestaurant implements TopObserver{
 
         return topRestaurants.entrySet()
                 .stream()
-                .sorted(Comparator.comparingDouble(a -> a.getValue().getAvgRating()))
+                .sorted(Comparator.comparingDouble((a -> a.getValue().getAvgRating())).reversed())
                 .limit(n)
                 .map(Map.Entry::getKey)
                 .collect(Collectors.toList());
